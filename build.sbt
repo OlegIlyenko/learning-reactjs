@@ -1,4 +1,4 @@
-name := "reactjs-learn"
+name := "learning-reactjs"
 
 version := "1.0-SNAPSHOT"
 
