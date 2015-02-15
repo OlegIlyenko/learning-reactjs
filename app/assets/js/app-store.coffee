@@ -38,9 +38,10 @@ global.AppListStore = Reflux.createStore
     loadedList = localStorage.getItem(@localStorageKey)
 
     if !loadedList
-      @apps = _.range(@maxId, @maxId + 10).map (i) ->
+      @apps = _.range(@maxId, @maxId + 100).map (i) ->
         id: i
         name: "App #{i}"
+        status: if i % 2 == 0 then "ok" else "error"
     else
       @apps = JSON.parse(loadedList)
 

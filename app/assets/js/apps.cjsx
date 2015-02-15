@@ -82,6 +82,39 @@ ConfirmDialog = React.createClass
   componentDidMount: ->
     @refs.cancelButton.getDOMNode().focus()
 
+StatusWidget = React.createClass
+  displayName: "StatusWidget"
+
+  componentDidMount: ->
+    if @props.colors.length > 1
+      [head, tail...] = @props.colors
+      @trans(tail.concat([head]))
+
+  trans: (colors)->
+    if @unmounted then return
+
+    [head, tail...] = colors
+
+    d3
+    .select @refs.innerCircle.getDOMNode()
+    .transition()
+    .style "fill", head
+    .duration 2000
+    .each "end", => @trans(tail.concat([head]))
+
+  componentWillUnmount: ->
+    console.info("unmounted")
+    @unmounted = true
+
+  render: ->
+    radius = @props.radius
+    innerRadius = @props.radius * 0.65
+
+    <svg className="status-indicator" width={radius * 2} height={radius * 2} className={@props.className}>
+      <circle cx={radius} cy={radius} r={radius} fill={@props.borderColor} />
+      <circle cx={radius} cy={radius} r={innerRadius} fill={@props.colors[0]} ref="innerCircle" />
+    </svg>
+
 Apps = React.createClass
   displayName: "Apps"
   mixins: [Reflux.connect(UIStore, "ui"), Reflux.connect(AppListStore, "apps")],
@@ -114,6 +147,7 @@ Apps = React.createClass
         <Table responsive>
           <thead>
             <tr>
+              <th></th>
               <th>ID</th>
               <th>Name</th>
               <th></th>
@@ -122,7 +156,8 @@ Apps = React.createClass
           <tbody>{
             _.map @state.apps, (app) =>
               <tr key={app.id}>
-                <td>{app.id}</td>
+                <td width="30">{@renderStaus(app)}</td>
+                <td width="50">{app.id}</td>
                 <td>{app.name}</td>
                 <td>{@renderButtons(app)}</td>
               </tr>
@@ -142,14 +177,19 @@ Apps = React.createClass
       </ModalTrigger>
     </div>
 
+  renderStaus: (app) ->
+    if app.status == "ok"
+      <StatusWidget radius={10} borderColor="#E2F0DA" colors={["#ABD697"]} className="pull-right" />
+    else
+      <StatusWidget radius={10} borderColor="#FDE3E0" colors={["#F04B4C", "#F69B98"]} className="pull-right" />
+
   renderGrid: ->
     _(@state.apps).chunk(4).map (chunk, idx) =>
       <Row key={idx}>{
-
         _.map chunk, (app) =>
           <Col md={3} key={app.id}>
             <Panel header={<div>{app.name} {@renderButtons(app)}</div>}>
-              {app.id}: {app.name}
+              {app.id}: {app.name} {@renderStaus(app)}
             </Panel>
           </Col>
       }</Row>

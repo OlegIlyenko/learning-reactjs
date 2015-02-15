@@ -20,7 +20,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "rxjs" % "2.3.24",
   "org.webjars" % "react-router" % "0.12.0",
   "org.webjars" % "refluxjs" % "0.2.4",
-  "org.webjars" % "lodash" % "3.1.0"
+  "org.webjars" % "lodash" % "3.1.0",
+  "org.webjars" % "d3js" % "3.5.3"
 )
 
 ReactJsKeys.harmony := true
