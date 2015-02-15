@@ -1,4 +1,4 @@
-{Grid, Row, Col, Navbar, Nav, NavItem, DropdownButton, MenuItem, ButtonGroup, Button, Table, Panel, Glyphicon, Modal, ModalTrigger, Input} = ReactBootstrap
+{Grid, Row, Col, Navbar, Nav, NavItem, DropdownButton, MenuItem, ButtonGroup, Button, Table, Panel, Glyphicon, Modal, ModalTrigger, Input, Alert} = ReactBootstrap
 {HistoryLocation, DefaultRoute, Link, Route, Redirect, RouteHandler} = ReactRouter
 {NavItemLink, ButtonLink} = ReactRouterBootstrap
 
@@ -195,6 +195,22 @@ Apps = React.createClass
       }</Row>
     .value()
 
+ErrorReporter = React.createClass
+  displayName: "ErrorReporter"
+  mixins: [Reflux.connect(ErrorStore)],
+
+  render: ->
+    <Grid>
+      <Row>
+        <Col md={12}>{
+          if @state? and @state.error?
+            <Alert bsStyle="danger" dismissAfter={5000} onDismiss={-> ErrorActions.clear()}>
+              <strong>Oops!</strong> {@state.message}
+            </Alert>
+        }</Col>
+      </Row>
+    </Grid>
+
 Group = React.createClass
     displayName: "Group"
     render: ->
@@ -216,6 +232,7 @@ AppsView = React.createClass
     <DocumentTitle title="Applications">
       <Group>
         <Navigation />
+        <ErrorReporter />
         <Apps />
       </Group>
     </DocumentTitle>

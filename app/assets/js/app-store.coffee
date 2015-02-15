@@ -1,54 +1,59 @@
+global.ErrorActions = Reflux.createActions [
+  "serverError",
+  "clear"
+]
+
 global.AppActions = Reflux.createActions [
   "addApp",
   "updateApp",
-  "deleteApp"
+  "deleteApp",
+  "updated"
 ]
 
+updateHandler = (p) ->
+  p.then AppActions.updated
+  .fail ErrorActions.serverError
+
+AppActions.addApp.listen (app) ->
+  updateHandler($.ajax {url: "/api/apps", type: "POST", data: JSON.stringify(app), contentType: "application/json"})
+
+AppActions.updateApp.listen (app) ->
+  updateHandler($.ajax {url: "/api/apps/#{app.id}", type: "PUT", data: JSON.stringify(app), contentType: "application/json"})
+
+AppActions.deleteApp.listen (id) ->
+  updateHandler($.ajax {url: "/api/apps/#{id}", type: "DELETE"})
 
 global.AppListStore = Reflux.createStore
   listenables: [AppActions],
 
-  apps: []
-  maxId: 0
-  localStorageKey: "apps"
+  init: ->
+    @update()
 
-  onAddApp: (app) ->
-    @maxId += 1
-    app.id = @maxId
+  onUpdated: (app) ->
+    @update()
 
-    @apps.push app
+  update: () ->
+    $.get("/api/apps")
+    .then (list) =>
+      @trigger(list)
+    .fail ErrorActions.serverError
 
-    @update(@apps)
-
-  onUpdateApp: (app) ->
-    @apps[_.findIndex(@apps, (a) -> a.id == app.id)] = app
-
-    @update(@apps)
-
-  onDeleteApp: (id) ->
-    @apps = _.remove(@apps, (a) -> a.id != id)
-
-    @update(@apps)
-
-  update: (list) ->
-    localStorage.setItem @localStorageKey, JSON.stringify(list)
-    @trigger(list)
 
   getInitialState: ->
-    loadedList = localStorage.getItem(@localStorageKey)
+    []
 
-    if !loadedList
-      @apps = _.range(@maxId, @maxId + 100).map (i) ->
-        id: i
-        name: "App #{i}"
-        status: if i % 2 == 0 then "ok" else "error"
-    else
-      @apps = JSON.parse(loadedList)
+global.ErrorStore = Reflux.createStore
+  listenables: [ErrorActions],
 
-    @maxId = _.chain(@apps).map((app) -> app.id).max().value()
+  onServerError: (error) ->
+    @trigger
+      error: error
+      message: error.statusText
 
-    @apps
-
+  onClear: ->
+    @trigger
+      error: null
+      message: null
 
 global.UIActions = Reflux.createActions [
   "changeListState"

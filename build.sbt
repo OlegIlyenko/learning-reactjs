@@ -21,8 +21,11 @@ libraryDependencies ++= Seq(
   "org.webjars" % "react-router" % "0.12.0",
   "org.webjars" % "refluxjs" % "0.2.4",
   "org.webjars" % "lodash" % "3.1.0",
-  "org.webjars" % "d3js" % "3.5.3"
+  "org.webjars" % "d3js" % "3.5.3",
+  "org.reactivemongo" %% "reactivemongo" % "0.11.0-SNAPSHOT"
 )
 
 ReactJsKeys.harmony := true
 sassOptions := Seq("--compass")
+
+resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"

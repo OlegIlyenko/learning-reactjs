@@ -6,5 +6,10 @@
 GET     /assets/*file         controllers.Assets.versioned(path="/public", file)
 GET     /webjars/*file        controllers.WebJarAssets.at(file)
 
-GET     /                     controllers.Application.index(path = "/")
-GET     /*path                controllers.Application.index(path)
+GET     /api/apps             @controllers.Apps.listApps
+POST    /api/apps             @controllers.Apps.addApp
+PUT     /api/apps/:id         @controllers.Apps.updateApp(id)
+DELETE  /api/apps/:id         @controllers.Apps.deleteApp(id)
+
+GET     /                     @controllers.Application.index(path = "/")
+GET     /*path                @controllers.Application.index(path)
