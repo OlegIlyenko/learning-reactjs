@@ -6,4 +6,5 @@
 GET     /assets/*file         controllers.Assets.versioned(path="/public", file)
 GET     /webjars/*file        controllers.WebJarAssets.at(file)
 
+GET     /                     controllers.Application.index(path = "/")
 GET     /*path                controllers.Application.index(path)
