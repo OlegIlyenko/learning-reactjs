@@ -103,7 +103,6 @@ StatusWidget = React.createClass
     .each "end", => @trans(tail.concat([head]))
 
   componentWillUnmount: ->
-    console.info("unmounted")
     @unmounted = true
 
   render: ->
@@ -118,6 +117,9 @@ StatusWidget = React.createClass
 Apps = React.createClass
   displayName: "Apps"
   mixins: [Reflux.connect(UIStore, "ui"), Reflux.connect(AppListStore, "apps")],
+
+  componentDidMount: ->
+    AppActions.list()
 
   deleteApp: (id) ->
     AppActions.deleteApp id

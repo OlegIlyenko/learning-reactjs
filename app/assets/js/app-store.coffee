@@ -1,13 +1,15 @@
 global.ErrorActions = Reflux.createActions [
-  "serverError",
+  "serverError"
   "clear"
 ]
 
 global.AppActions = Reflux.createActions [
-  "addApp",
-  "updateApp",
-  "deleteApp",
+  "addApp"
+  "updateApp"
+  "deleteApp"
+
   "updated"
+  "list"
 ]
 
 updateHandler = (p) ->
@@ -26,10 +28,10 @@ AppActions.deleteApp.listen (id) ->
 global.AppListStore = Reflux.createStore
   listenables: [AppActions],
 
-  init: ->
+  onUpdated: (app) ->
     @update()
 
-  onUpdated: (app) ->
+  onList: () ->
     @update()
 
   update: () ->

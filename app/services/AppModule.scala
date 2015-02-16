@@ -1,11 +1,16 @@
 package services
 
-import akka.actor.ActorSystem
+import akka.actor._
+import akka.util.Timeout
 import play.api.libs.iteratee.Concurrent
 import reactivemongo.api.{DB, MongoConnection, MongoDriver}
 import scaldi.Module
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.App
+import scala.concurrent.duration._
+import scaldi.akka.AkkaInjectable._
+
+import scala.util.{Failure, Success}
 
 class AppModule extends Module {
 
@@ -22,5 +27,11 @@ class AppModule extends Module {
   bind [DB] to inject[MongoConnection].db(inject [String] ("mongodb.db"))
 
   binding to new AppRepo
-}
 
+  binding toProvider  new AppMonitor
+  binding toProvider  new AppsManager
+
+  binding identifiedBy 'appManager to inject[ActorSystem].actorOf(injectActorProps [AppsManager])
+
+  binding identifiedBy 'requestTimeout to Timeout(5 seconds)
+}

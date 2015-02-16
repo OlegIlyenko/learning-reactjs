@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   "org.scaldi" %% "scaldi-play" % "0.5.3",
+  "org.scaldi" %% "scaldi-akka" % "0.5.3",
   "org.webjars" %% "webjars-play" % "2.3.0-2",
   "org.webjars" % "bootstrap" % "3.3.2",
   "org.webjars" % "jquery" % "2.1.3",
