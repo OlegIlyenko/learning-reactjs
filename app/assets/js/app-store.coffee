@@ -10,6 +10,8 @@ global.AppActions = Reflux.createActions [
 
   "updated"
   "list"
+  "subscribe"
+  "unsubscribe"
 ]
 
 updateHandler = (p) ->
@@ -28,8 +30,38 @@ AppActions.deleteApp.listen (id) ->
 global.AppListStore = Reflux.createStore
   listenables: [AppActions],
 
+  subs: 0
+  eventSource: null
+
   onUpdated: (app) ->
-    @update()
+    # SSE should update
+
+  onSubscribe: ->
+    @subs++
+    @updateSubscription()
+
+  onUnsubscribe: ->
+    @subs--
+    @updateSubscription()
+
+  updateSubscription: ->
+    if @eventSource? and @subs == 0
+      @eventSource.close()
+      @eventSource = null
+    else if not @eventSource? and @subs > 0
+      @eventSource = new EventSource("/api/apps/updates")
+
+      @eventSource.addEventListener "message", (msg) =>
+        @update()
+
+      @eventSource.addEventListener "error", (e) =>
+        @eventSource.close()
+        @eventSource = null
+
+        ErrorActions.serverError(e)
+
+        Promise.delay(1000).then =>
+          @updateSubscription()
 
   onList: () ->
     @update()

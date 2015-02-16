@@ -2,6 +2,8 @@ package controllers
 
 import akka.actor.ActorRef
 import akka.util.Timeout
+import play.api.libs.EventSource
+import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{Action, Controller}
 import scaldi.{Injector, Injectable}
@@ -17,6 +19,7 @@ class Apps(implicit inj: Injector) extends Controller with Injectable {
 
   val repo = inject [AppRepo]
   val appManager = inject [ActorRef] (identified by 'appManager)
+  val appUpdatesOut = inject [Enumerator[String]] (identified by 'appUpdates)
 
   def listApps = Action.async {
     repo.list map (Json.toJson(_)) map (Ok(_))
@@ -36,5 +39,9 @@ class Apps(implicit inj: Injector) extends Controller with Injectable {
 
   def deleteApp(id: String) = Action.async {
     appManager ? DeleteApp(id) map (_ => NoContent)
+  }
+
+  def appUpdates = Action { req =>
+    Ok.feed(appUpdatesOut &> EventSource()).as("text/event-stream")
   }
 }

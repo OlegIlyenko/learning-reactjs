@@ -10,11 +10,9 @@ import models.App
 import scala.concurrent.duration._
 import scaldi.akka.AkkaInjectable._
 
-import scala.util.{Failure, Success}
-
 class AppModule extends Module {
 
-  lazy val (appUpdatesOut, appUpdatesChannel) = Concurrent.broadcast[App]
+  lazy val (appUpdatesOut, appUpdatesChannel) = Concurrent.broadcast[String]
 
   binding identifiedBy 'appUpdates to appUpdatesOut
   binding identifiedBy 'appUpdates to appUpdatesChannel

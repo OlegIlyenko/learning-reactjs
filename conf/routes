@@ -8,6 +8,7 @@ GET     /webjars/*file        controllers.WebJarAssets.at(file)
 
 GET     /api/apps             @controllers.Apps.listApps
 POST    /api/apps             @controllers.Apps.addApp
+GET     /api/apps/updates     @controllers.Apps.appUpdates
 PUT     /api/apps/:id         @controllers.Apps.updateApp(id)
 DELETE  /api/apps/:id         @controllers.Apps.deleteApp(id)
 

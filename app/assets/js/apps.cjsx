@@ -89,21 +89,34 @@ StatusWidget = React.createClass
     if @props.colors.length > 1
       [head, tail...] = @props.colors
       @trans(tail.concat([head]))
+    else
+      d3
+      .select @refs.innerCircle.getDOMNode()
+      .transition()
+      .style "fill", @props.colors[0]
 
-  trans: (colors)->
-    if @unmounted then return
+  componentWillUpdate: ->
+    @componentWillUnmount()
 
-    [head, tail...] = colors
-
-    d3
-    .select @refs.innerCircle.getDOMNode()
-    .transition()
-    .style "fill", head
-    .duration 2000
-    .each "end", => @trans(tail.concat([head]))
+  componentDidUpdate: ->
+    @componentDidMount()
 
   componentWillUnmount: ->
-    @unmounted = true
+    d3
+    .select @refs.innerCircle.getDOMNode()
+    .interrupt()
+
+  trans: (colors)->
+    if @refs.innerCircle
+      [head, tail...] = colors
+
+      d3
+      .select @refs.innerCircle.getDOMNode()
+      .transition()
+      .style "fill", head
+      .duration 1000
+      .each "end", =>
+        @trans(tail.concat([head]))
 
   render: ->
     radius = @props.radius
@@ -120,6 +133,10 @@ Apps = React.createClass
 
   componentDidMount: ->
     AppActions.list()
+    AppActions.subscribe()
+
+  componentWillUnmount: ->
+    AppActions.unsubscribe()
 
   deleteApp: (id) ->
     AppActions.deleteApp id
@@ -189,9 +206,10 @@ Apps = React.createClass
     _(@state.apps).chunk(4).map (chunk, idx) =>
       <Row key={idx}>{
         _.map chunk, (app) =>
+          name = _.trunc(app.name, 15)
           <Col md={3} key={app.id}>
-            <Panel header={<div>{app.name} {@renderButtons(app)}</div>}>
-              {app.id}: {app.name} {@renderStaus(app)}
+            <Panel header={<div>{name} {@renderButtons(app)}</div>}>
+              {name} {@renderStaus(app)}
             </Panel>
           </Col>
       }</Row>

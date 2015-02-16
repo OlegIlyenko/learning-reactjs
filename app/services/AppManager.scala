@@ -2,6 +2,7 @@ package services
 
 import akka.actor._
 import models.App
+import play.api.libs.iteratee.Concurrent
 import scaldi.Injector
 import scaldi.akka.AkkaInjectable._
 
@@ -52,7 +53,6 @@ class AppsManager(implicit inj: Injector) extends Actor with Stash with ActorLog
       val monitor = sender()
 
       context watch monitor
-
       apps = apps :+ (app.id.get, monitor)
 
       origin ! app
