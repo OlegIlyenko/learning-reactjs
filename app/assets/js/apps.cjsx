@@ -95,6 +95,9 @@ StatusWidget = React.createClass
       .transition()
       .style "fill", @props.colors[0]
 
+  shouldComponentUpdate: (nextProps) ->
+    @props.borderColor != nextProps.borderColor
+
   componentWillUpdate: ->
     @componentWillUnmount()
 
@@ -114,7 +117,7 @@ StatusWidget = React.createClass
       .select @refs.innerCircle.getDOMNode()
       .transition()
       .style "fill", head
-      .duration 1000
+      .duration 3000
       .each "end", =>
         @trans(tail.concat([head]))
 
